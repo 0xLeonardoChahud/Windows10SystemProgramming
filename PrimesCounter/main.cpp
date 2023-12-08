@@ -31,6 +31,17 @@ bool isPrime(unsigned int number) {
 	return true;
 }
 
+// This is the function (code) that all threads created will run.
+// First, this prototype is a must due to compatibility with the Windows API.
+// Now, WINAPI may be the main doubt for the ones who are new to Windows programming.
+// WINAPI is just a typedef for __stdcall which then should clarify all your doubts.
+// stdcall is what we call a "calling convention" that should be interpreted as
+// a set of rules that dictate how parameters should be passed to a function in a function call
+// and also which function (caller or callee) should be responsible for cleaning the storage used.
+// Parameters should be passed on the stack? (cdecl and stdcall) On certain registers first? (fastcall)
+// It is that type of question that the calling conventions aim to answer properly.
+// Finally, what we are saying with the WINAPI part is that the function CountPrimes will use the stdcall calling convention
+// and we do this because it is necessary according to the microsoft documentation for the CreateThread function.
 DWORD WINAPI CountPrimes(PVOID pParameter) {
 	PINTERVAL_DATA pData{ static_cast<PINTERVAL_DATA>(pParameter) };
 	unsigned int count{ 0 };
@@ -54,8 +65,8 @@ int wmain(const int argc, const wchar_t* argv[]) {
 		return 1;
 	}
 
-	// perThread -> stores how many numbers threads will check.
-	// restPerThread -> additional numbers to check.
+	// perThread -> stores how many numbers each thread will check.
+	// restPerThread -> additional numbers for each thread to check.
 	unsigned int totalPrimes{ 0 };
 	unsigned int from{ static_cast<unsigned int>(_wtoi(argv[1])) };
 	unsigned int to{ static_cast<unsigned int>(_wtoi(argv[2])) };
@@ -86,10 +97,10 @@ int wmain(const int argc, const wchar_t* argv[]) {
 	printf("\t%-25s%-20s\n", "Thread Id", "Interval");
 	for (unsigned int i = from, tidx = 0; i <= to; tidx++) {
 		
-		// If restPerThread == 0, then each thread received an equal number of numbers to verify
-		// Otherwise, we add one number sequentially until there are no more numbers to count
-		// If the number of threads (nThreads) is grater than the interval size,
-		// then restPerThread = interval size and each thread will verify one number.
+		// If restPerThread == 0 then each thread received an equal number of numbers to verify
+		// Otherwise, we add one number sequentially until there are no more numbers to count.
+		// If the number of threads (nThreads) is greater than the interval size,
+		// then (restPerThread = interval size) and each thread will verify one number.
 		// Also, in this last case the number of threads will be equal to the interval size due to condition ( i <= to )
 		ptrIntervalData[tidx].count = 0;
 		ptrIntervalData[tidx].from = i;
