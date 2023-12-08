@@ -18,6 +18,7 @@ private:
 	void Cleanup(void);
 	HANDLE getHandleFromPid(const DWORD pid);
 	const std::wstring getImagePathName(const HANDLE hProcess);
+	DWORD GetProcessIdByName(const std::wstring& procName);
 
 public:
 	ProcessManager(const DWORD pid = 0);
@@ -29,13 +30,12 @@ public:
 	// Getters
 	const std::wstring& getProcessName(void) const { return this->processName; }
 	const std::wstring& getImagePath(void) const { return this->imagePathName; }
-	DWORD GetProcessId(void) const { return this->processId; }
+	DWORD getProcessId(void) const { return this->processId; }
 
 
 	// Functionality
 	DWORD DisplayProcessList(const bool filter = false, const std::wstring& procName = L"(none)") const;
 	void DisplayProcessInfo(void) const;
-	DWORD GetProcessIdByName(const std::wstring& procName);
 	void TerminateProcess(DWORD exitCode = 0);
 	void SuspendProcess(void);
 	void ResumeProcess(void);

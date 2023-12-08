@@ -7,12 +7,13 @@ int wmain(const int argc, const wchar_t* argv[]) {
 	ProcessManager procMg;
 	
 	unsigned short int option{ 0 };
-	std::wstring menu = L"\t[ MENU ]\n\t(1) - Display Process List\n\t(2) - Set current process\n\t(3) - Display Process Information\n\t(4) - Kill Process\n\t(5) - Suspend Process\n\t(6) - Resume Process\n\t(7) - Exit\n\n";
+	std::wstring menu = L"\t[ MENU ]\n\t(1) - Display Process List\n\t(2) - Set current process\n\t(3) - Display Process Information\n\t(4) - Kill Process\n\t(5) - Suspend Process\n\t(6) - Resume Process\n\t(7) - Exit\n";
 	wchar_t procName[MAX_PATH]{ 0 };
+	std::wstring lastOperationDone = L"(none)";
 	DWORD procId{ 0 };
-
+		
 	while (option != 7) {
-		printf("%ws\n[ Input ]: ", menu.data());
+		printf("%ws\n\t[ info ] Last operation done: %ws\n\n[ Input ]: ", menu.data(), lastOperationDone.data());
 		
 		if (!(std::cin >> option)) {
 			std::cin.clear();
@@ -26,6 +27,7 @@ int wmain(const int argc, const wchar_t* argv[]) {
 		switch (option){
 		case 1:
 			procMg.DisplayProcessList();
+			lastOperationDone = L"Process list displayed";
 			break;
 		case 2:
 			printf("\n\t(1) - Specify process name\n\t(2) - Specify process id\n");
@@ -48,18 +50,23 @@ int wmain(const int argc, const wchar_t* argv[]) {
 				std::cin >> procId;
 				procMg.UpdateProcess(procId);
 			}
+			lastOperationDone = L"Process Updated";
 			break;
 		case 3:
 			procMg.DisplayProcessInfo();
+			lastOperationDone = L"Process Info Displayed";
 			break;
 		case 4:
 			procMg.TerminateProcess();
+			lastOperationDone = L"Process Terminated";
 			break;
 		case 5:
 			procMg.SuspendProcess();
+			lastOperationDone = L"Process Suspended";
 			break;
 		case 6:
 			procMg.ResumeProcess();
+			lastOperationDone = L"Process Resumed";
 			break;
 		case 7:
 			break;
