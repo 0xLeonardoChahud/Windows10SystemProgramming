@@ -13,13 +13,13 @@ ProcessManager::ProcessManager(const DWORD pid) : processId(pid),
 							   processName(L"(none)") {
 	
 	// Set up suspend/resume function ptrs
-	HMODULE hNtdll = ::GetModuleHandle(L"ntdll.dll");
-	if (!hNtdll) {
-		printf("[-] Failed setting up suspend/resume functionality\n");
-		return;
-	}
-
 	if (ptrSuspendProcess == nullptr || ptrResumeProcess == nullptr) {
+		HMODULE hNtdll = ::GetModuleHandle(L"ntdll.dll");
+		if (!hNtdll) {
+			printf("[-] Failed setting up suspend/resume functionality\n");
+			return;
+		}
+
 		ProcessManager::ptrSuspendProcess = ::GetProcAddress(hNtdll, "NtSuspendProcess");
 		ProcessManager::ptrResumeProcess = ::GetProcAddress(hNtdll, "NtResumeProcess");
 	}
