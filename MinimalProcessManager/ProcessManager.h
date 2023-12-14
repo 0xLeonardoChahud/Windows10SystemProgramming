@@ -39,7 +39,11 @@ public:
 	void TerminateProcess(DWORD exitCode = 0);
 	void SuspendProcess(void);
 	void ResumeProcess(void);
+	void SetPriorityClass(DWORD newPriority);
 
+	// Peripherical Functionality
+	void CreateSpoofedPProcess(const std::wstring& processPath, const std::wstring& parentProcessPath);
+	void CreateSpoofedPProcess(const std::wstring& processPath, const DWORD pid);
 	
 
 

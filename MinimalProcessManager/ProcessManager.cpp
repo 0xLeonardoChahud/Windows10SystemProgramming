@@ -157,3 +157,76 @@ void ProcessManager::ResumeProcess(void) {
 	if (this->hProcess)
 		static_cast<ptrNtResumeProcess>(ProcessManager::ptrResumeProcess)(this->hProcess);
 }
+
+void ProcessManager::SetPriorityClass(DWORD newPriority) {
+	if (this->hProcess)
+		::SetPriorityClass(this->hProcess, newPriority);
+}
+
+void ProcessManager::CreateSpoofedPProcess(const std::wstring& processPath, const std::wstring& parentProcessPath) {
+	this->CreateSpoofedPProcess(processPath, this->GetProcessIdByName(parentProcessPath));
+}
+
+
+void ProcessManager::CreateSpoofedPProcess(const std::wstring& exePath, const DWORD pid) {
+	
+	// These variables need to be nonconst due to CreateProcess documentation. So we pass them to the stack without const modifier.
+	std::wstring procPathCpy(exePath);
+	SIZE_T procThreadAttrListSize{ 0 };
+	LPPROC_THREAD_ATTRIBUTE_LIST procThreadAttr{ nullptr };
+	STARTUPINFOEXW procStartupInfoEx{ 0 };
+	PROCESS_INFORMATION procInfo{ 0 };
+	HANDLE hParent{ nullptr };
+	DWORD parentPid{ pid };
+
+	::ZeroMemory(&procStartupInfoEx, sizeof(STARTUPINFOEXW));
+	::ZeroMemory(&procInfo, sizeof(PROCESS_INFORMATION));
+
+	hParent = ::OpenProcess(PROCESS_CREATE_PROCESS, FALSE, parentPid);
+	if (!hParent) {
+		printf("[-] Unable to acquire handle for parent process\n");
+		return;
+	}
+
+
+	::InitializeProcThreadAttributeList(nullptr, 1, 0, &procThreadAttrListSize);
+
+	procThreadAttr = (LPPROC_THREAD_ATTRIBUTE_LIST)(new byte[procThreadAttrListSize]);
+
+	if (!::InitializeProcThreadAttributeList(procThreadAttr, 1, 0, &procThreadAttrListSize)) {
+		printf("[-] Failed to initialize process_thread_attribute list\n");
+		goto Cleanup;
+	}
+
+	if (!::UpdateProcThreadAttribute(procThreadAttr, 0, PROC_THREAD_ATTRIBUTE_PARENT_PROCESS, &hParent, sizeof(HANDLE), nullptr, nullptr)) {
+		printf("[-] Failed initializing proc_thread_attr values\n");
+		goto Cleanup;
+	}
+
+
+	procStartupInfoEx.StartupInfo.cb = sizeof(STARTUPINFOEXW);
+	procStartupInfoEx.lpAttributeList = procThreadAttr;
+	if (!::CreateProcess(nullptr, const_cast<PWSTR>(procPathCpy.data()), nullptr, nullptr, FALSE, EXTENDED_STARTUPINFO_PRESENT, nullptr, nullptr, reinterpret_cast<LPSTARTUPINFO>(&procStartupInfoEx), &procInfo)) {
+		printf("[-] Failed creating child process with modified parent process: %u\n", ::GetLastError());
+		goto Cleanup;
+	}
+
+
+	printf("[+] Child process created with pid=%u\n", procInfo.dwProcessId);
+
+	Cleanup:
+		if (hParent) {
+			::CloseHandle(hParent);
+		}
+		if (procThreadAttr) {
+			::DeleteProcThreadAttributeList(procThreadAttr);
+			delete[] procThreadAttr;
+		}
+		if (procInfo.hProcess) {
+			::CloseHandle(procInfo.hProcess);
+		}
+		if (procInfo.hThread) {
+			::CloseHandle(procInfo.hThread);
+		}
+
+}
