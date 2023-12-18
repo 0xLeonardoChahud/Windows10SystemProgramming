@@ -31,11 +31,15 @@ void getInput(const std::wstring& prefix, T& p) {
 }
 
 
-
+// The wmain function implements all the logic around gathering user input
+// to be used for the ProcessManager class.
 int wmain(const int argc, const wchar_t* argv[]) {
 	
+	// We will need one instance of the class
 	ProcessManager procMg;
 	
+	// Besides all the named variables which their use should be clear
+	// The aux0x variables are used to store temporary strings to be passed as parameters to functions 
 	unsigned short int option{ 0 };
 	std::wstring menu = L"\t[ MENU ]\n\t(1) - Display Process List\n\t(2) - Set current process\n\t(3) - Display Process Information\n\t(4) - Kill Process\n\t(5) - Suspend Process\n\t(6) - Resume Process\n\t(7) - Set Process Priority\n\t(8) - Create process with spoofed parent id\n\t(9) - Exit\n";
 	std::wstring lastOperationDone = L"(none)";
@@ -47,11 +51,16 @@ int wmain(const int argc, const wchar_t* argv[]) {
 		
 	while (option != 9) {
 		
+		// Display the menu and the last operation performed by the program
+		//
 		aux01 = menu + L"\n\t[info] Last operation done : " + lastOperationDone + L"\n\n[Input]: ";
 		getInput(aux01, option);
 
+		// Clear the terminal screen
 		system("cls");
 
+		// Process the option inserted by the user
+		// To better understand everything here. I strongly suggest you to read the ProcessManager.cpp file
 		switch (option){
 		case 1:
 			procMg.DisplayProcessList();
