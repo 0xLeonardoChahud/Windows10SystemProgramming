@@ -128,9 +128,11 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="PEParser.cpp" />
     <ClCompile Include="ProcessManager.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="PEParser.h" />
     <ClInclude Include="ProcessManager.h" />
   </ItemGroup>
   <ItemGroup>

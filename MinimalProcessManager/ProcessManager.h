@@ -3,7 +3,7 @@
 #include <string>
 #include <Windows.h>
 #include <TlHelp32.h>
-
+#include "PEParser.h"
 
 class ProcessManager {
 private:
@@ -11,6 +11,7 @@ private:
 	std::wstring imagePathName;
 	DWORD processId;
 	HANDLE hProcess;
+	PEParser peParser;
 
 	static void* ptrSuspendProcess;
 	static void* ptrResumeProcess;
@@ -19,6 +20,10 @@ private:
 	HANDLE getHandleFromPid(const DWORD pid);
 	const std::wstring getImagePathName(const HANDLE hProcess);
 	DWORD GetProcessIdByName(const std::wstring& procName);
+	const wchar_t* getPriorityText(const DWORD priorityValue) const;
+
+
+	
 
 public:
 	ProcessManager(const DWORD pid = 0);

@@ -10,7 +10,7 @@ void* ProcessManager::ptrSuspendProcess = nullptr;
 ProcessManager::ProcessManager(const DWORD pid) : processId(pid), 
 							   hProcess(nullptr), 
 							   imagePathName(L"(none)"), 
-							   processName(L"(none)") {
+							   processName(L"(none)"), peParser(imagePathName) {
 	
 	// Set up suspend/resume function ptrs
 	if (ptrSuspendProcess == nullptr || ptrResumeProcess == nullptr) {
@@ -49,8 +49,13 @@ void ProcessManager::UpdateProcess(const DWORD pid) {
 	this->Cleanup();
 	this->processId = pid;
 	this->hProcess = this->getHandleFromPid(pid);
+	if (!this->hProcess)
+		return;
 	this->imagePathName = this->getImagePathName(this->hProcess);
+	if (!this->imagePathName.compare(L"(none)"))
+		return;
 	this->processName.assign(imagePathName.substr(imagePathName.find_last_of('\\') + 1));
+	this->peParser.Reload(this->imagePathName);
 }
 
 
@@ -86,6 +91,7 @@ void ProcessManager::Cleanup(void) {
 	this->hProcess = nullptr;
 	this->imagePathName = L"(none)";
 	this->processName = L"(none)";
+	this->peParser.clean();
 }
 
 // Functionality
@@ -130,8 +136,26 @@ DWORD ProcessManager::DisplayProcessList(const bool filter, const std::wstring& 
 
 
 void ProcessManager::DisplayProcessInfo(void) const {
+	std::wstring priorityClass{ L"(none)"};
+	DWORD handleCount{ 0 };
+	BOOL priorityBoost{ FALSE };
+	bool is64bit{ this->peParser.is64bit() };
+	SIZE_T minWorkSize{ 0 };
+	SIZE_T maxWorkSize{ 0 };
+	
+	
+	
+
+	if (this->hProcess) {
+		::GetProcessPriorityBoost(this->hProcess, &priorityBoost);
+		::GetProcessHandleCount(this->hProcess, &handleCount);
+		::GetProcessWorkingSetSize(this->hProcess, &minWorkSize, &maxWorkSize);
+		priorityClass = this->getPriorityText(::GetPriorityClass(this->hProcess));
+	}
+
 	printf("- - - - - PROCESS INFORMATION - - - - -\n");
-	printf("Process Id: %u\nProcess Name: %ws\nImage Full Path: %ws\n\n", this->processId, this->processName.data(), this->imagePathName.data());
+	printf("Process Id: %u\nProcess Name: %ws\nImage Full Path: %ws\nPriority Class: %ws\nHandle Count: %u\nMinimum Working Set Size: %u\nMaximum Working Set Size: %u\n64-bit: %u\n", 
+			this->processId, this->processName.data(), this->imagePathName.data(), priorityClass.data(), handleCount, minWorkSize, maxWorkSize, is64bit);
 	printf("- - - - - - - - - - - - - - - - - - - -");
 }
 
@@ -229,4 +253,48 @@ void ProcessManager::CreateSpoofedPProcess(const std::wstring& exePath, const DW
 			::CloseHandle(procInfo.hThread);
 		}
 
+}
+
+const wchar_t* ProcessManager::getPriorityText(const DWORD priorityValue) const {
+	switch (priorityValue) {
+	case IDLE_PRIORITY_CLASS:
+		return L"Idle Priority Class (4)";
+		break;
+	case BELOW_NORMAL_PRIORITY_CLASS:
+		return L"Below Normal Priority Class (6)";
+		break;
+	case NORMAL_PRIORITY_CLASS:
+		return L"Normal Priority Class (8)";
+		break;
+	case ABOVE_NORMAL_PRIORITY_CLASS:
+		return L"Above Normal Priority Class (10)";
+		break;
+	case HIGH_PRIORITY_CLASS:
+		return L"High Priority Class (13)";
+		break;
+	case REALTIME_PRIORITY_CLASS:
+		return L"Real Time Priority Class (24)";
+		break;
+	case THREAD_PRIORITY_IDLE:
+		return L"Thread Relative Idle Priority (-15)";
+		break;
+	case THREAD_PRIORITY_LOWEST:
+		return L"Thread Relative Lowset Priority (-2)";
+		break;
+	case THREAD_PRIORITY_BELOW_NORMAL:
+		return L"Thread Relative Priority Below Normal (-1)";
+		break;
+	case THREAD_PRIORITY_NORMAL:
+		return L"Thread Relative Idle Priority (0)";
+		break;
+	case THREAD_PRIORITY_ABOVE_NORMAL:
+		return L"Thread Relative Lowset Priority (+1)";
+		break;
+	case THREAD_PRIORITY_HIGHEST:
+		return L"Thread Relative Priority Below Normal (+2)";
+		break;
+	case THREAD_PRIORITY_TIME_CRITICAL:
+		return L"Thread Relative Priority Below Normal (+15)";
+		break;
+	}
 }
