@@ -99,6 +99,13 @@ int wmain(const int argc, const wchar_t* const argv[]) {
 	// Wait for all threads to finish their work.
 	::WaitForMultipleObjects(nThreads, thlist.get(), TRUE, INFINITE);
 
+	// Close thread handles
+	for (std::size_t i = 0; i < nThreads; i++) {
+		if (thlist[i])
+			::CloseHandle(thlist[i]);
+	}
+
+
 	// Print information
 	std::wcout << L"[ info ] Number of threads: " << nThreads << std::endl;
 	std::wcout << L"[ info ] Count for each thread: " << cnt << std::endl;
