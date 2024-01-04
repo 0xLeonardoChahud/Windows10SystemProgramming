@@ -1,3 +1,13 @@
+// [ Chapter 5: Thread Basics ]
+// Title: The primes counter application
+// App Style: Command line
+// Topics covered:
+// Chapter 5: Thread creation
+// Chapter 5: Waiting on waitable objects
+// Chapter 5: Thread functios prototypes
+
+
+
 #include <iostream>
 #include <vector>
 #include <new>

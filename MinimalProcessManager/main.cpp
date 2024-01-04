@@ -1,7 +1,20 @@
+// [ Chapter 3: Processes, Chapter 6: Thread Scheduling ]
+// Title: Minimal Process Manager
+// App Style: Command line
+// Topics covered:
+// Chapter 3: Process Creation				-> Spoofed Parent Functionality
+// Chapter 3: Process Enumeration			-> Process Manager Functionality (Toolhelp32) 
+// Chapter 3: Process Termination			-> Process Manager Functionality
+// Chapter 3: Suspending Process			-> Process Manager Functionality
+// Chapter 3: Resuming Process				-> Process Manager Functionality
+// Chapter 3: ProcThreadAttributeList		-> Spoofed Parent Functionality
+// Chapter 6: Process Base Priority			-> Process Manager Functionality
+
 #include "ProcessManager.h"
 #include <limits>
 #include <cctype>
 
+// Polymorphic getInput functions that enables us to obtain user input.
 void getInput(const std::wstring& prefix, std::wstring& s) {
 	while (true) {
 		printf("%ws", prefix.data());
@@ -35,11 +48,11 @@ void getInput(const std::wstring& prefix, T& p) {
 // to be used for the ProcessManager class.
 int wmain(const int argc, const wchar_t* argv[]) {
 	
-	// We will need one instance of the class
+	// We will need one instance of this class
 	ProcessManager procMg;
 	
-	// Besides all the named variables which their use should be clear
-	// The aux0x variables are used to store temporary strings to be passed as parameters to functions 
+	// Besides all the named variables which their use should be clear by now,
+	// the aux0x variables are used to store temporary strings to be passed as parameters to functions 
 	unsigned short int option{ 0 };
 	std::wstring menu = L"\t[ MENU ]\n\t(1) - Display Process List\n\t(2) - Set current process\n\t(3) - Display Process Information\n\t(4) - Kill Process\n\t(5) - Suspend Process\n\t(6) - Resume Process\n\t(7) - Set Process Priority\n\t(8) - Create process with spoofed parent id\n\t(9) - Exit\n";
 	std::wstring lastOperationDone = L"(none)";

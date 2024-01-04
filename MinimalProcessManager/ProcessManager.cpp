@@ -8,7 +8,7 @@ void* ProcessManager::ptrResumeProcess = nullptr;
 void* ProcessManager::ptrSuspendProcess = nullptr;
 
 // (1). Because we use not fully documented functions such as SuspendProcess and ResumeProcess
-// I have implemented a setup funcionality in the begining of the constructor
+// I have implemented a setup funcionality in the begining of the constructor.
 // Basically, we get those functions from the ntdll.dll module which is loaded by default
 // in every windows executable. Because of that, we can obtain their addresses with GetProcAddres.
 // Of course, we need to provide proper prototyping so we can use them in code.
@@ -53,7 +53,7 @@ ProcessManager::~ProcessManager() {
 	this->Cleanup();
 }
 
-// (1). Just function just exists to enable the programmer who is using our class
+// (1). This function just exists to enable the programmer who is using our class
 // to update the current process based on a process name instead of a process id
 // giving the ProcessManager class more versatility.
 void ProcessManager::UpdateProcess(const std::wstring& procName) {
@@ -130,13 +130,13 @@ void ProcessManager::Cleanup(void) {
 }
 
 // (1). This is probably the most important function for the MinimalProcessManager solution.
-// I first start initializing some variables properly following the microsoft documentation.
+// I first start initializing some variables according to the microsoft documentation.
 // Here, we are using th32help.h library to list all existing process on the system.
 // This function can be used for the following purposes: display process list and
 // search for a particular process (based on its name) returing its PID.
 // (2). Stores a handle to an object that represents a snapshot on the system.
-// Also, the program does some error handling (its probably going to be updated to use exceptions in the future)
-// (3). Finally, all the logic is implemented in this third section. The function receiveis a boolean variable
+// Also, the program does some error handling.
+// (3). Finally, all the logic is implemented in this third section. The function receives a boolean variable
 // that tells if the function is to be used as a filter or should simply list all processes.
 // In case the filter is off, we just print all the process information in a formatted way.
 // In case the filter is on AND the user has specified a valid process name (we never know),
@@ -208,7 +208,7 @@ void ProcessManager::DisplayProcessInfo(void) const {
 }
 
 // (1). This is a wrapper function that calls DisplayProcessList with the filtering
-// mdoe enabled. It allows using this member function to obtain process id based
+// mode enabled. It allows using this member function to obtain process id based
 // only on a process name.
 DWORD ProcessManager::GetProcessIdByName(const std::wstring& procName) {
 	return this->DisplayProcessList(true, procName);
@@ -248,25 +248,25 @@ void ProcessManager::ResumeProcess(void) {
 // Now, suppose that you have 8 logical processors. So you can run 8 threads simultaneasly.
 // But what if you have 20,40 or 2000 threads? (check your task manager) In that case we have to discuss something called
 // "thread states" and "priorities".
-// Begining with thread states, they just describe what that thread is doing at that particular moment.
-// Ready State -> Means that the thread WANTS to execute and is probably queued for a logical processor already.
-// Wait State -> Thread DOES NOT WANT TO RUN, it is waiting for some kind of event to occur (i.g user input).
+// Begining with thread states, they just describe what that thread is doing at a particular moment.
+// Ready State -> Means that the thread is READY to execute and is probably queued for a logical processor already.
+// Wait State -> Thread IS NOT READY TO RUN because it is waiting for some kind of event to occur (i.g user input).
 // Running State -> Is actually executing code.
 // So, based on that, we can correctly conclude that MOST of the threads are in the WAIT state.
 // Now, every thread has a priority which is defined by a combination of: thread relative priority (relative to the thread) + priority class (relative to the process)
 // By default, the task manager shows the Priority class ONLY and so doesn't tell us everything about the threads priority.
 // Points to note:
-// 1 - Threads Priority Range from 0 to 31 (considering kernel). In practice, for user mode programming: (1..31)
+// 1 - Threads Priority Range from 0 to 31 (considering special threads in kernel). In practice, for user mode programming: [1, 31]
 // 2 - Threads Priority = Threads Relative Priority + Priority Class
 // -----------------------------------------------------------------------
-// PRIORITY CLASS | VALUE				THREADS RELATIVE PRIORITY | VALUE
-//		IDLE		  4	[1-15]					 IDLE                -15
-//	BELOW NORMAL	  6	[1-15]   				LOWEST               -2
-//	   NORMAL		  8 [1-15]                BELOW NORMAL           -1
-//	ABOVE NORMAL      10 [1-15]                  NORMAL               +0
-//     HIGH           13 [1-15]               ABOVE NORMAL           +1
-//   REAL TIME        24 [16-31]                HIGHEST              +2
-// --------------------------------			  TIME CRITICAL			 +15
+// PRIORITY CLASS |		VALUE RANGE			THREADS RELATIVE PRIORITY | VALUE
+//		IDLE		  4	[1-15]					 IDLE		             -15
+//	BELOW NORMAL	  6	[1-15]   				LOWEST			         -02
+//	   NORMAL		  8 [1-15]                BELOW NORMAL			     -01
+//	ABOVE NORMAL      10 [1-15]                  NORMAL					 +00
+//     HIGH           13 [1-15]               ABOVE NORMAL			     +01
+//   REAL TIME        24 [16-31]                HIGHEST					 +02
+// --------------------------------			  TIME CRITICAL				 +15
 //
 // 3 - Priority Class also defines the range of the final threads priority. For every priority class, with the exception of
 // the REAL TIME, the final threads priority is in the range [1,15]. The REAL TIME one defines the range [16,31].
@@ -274,9 +274,9 @@ void ProcessManager::ResumeProcess(void) {
 // So, we basically sum the two numbers and if the value exceeds one of the extreme points (1 and (31 or 15)) then the value
 // considered is the closest extreme point. For example, if we have BELOW_NORMAL (6) priority class and IDLE relative priority (-15), we have a
 // FINAL thread priority of 1 and NOT -9.
-// [Round Robin Example]
-// [Thread Ideal Processor]
-// [Affinity and Processor Groups]
+// TODO: [Discuss Round Robin Example]
+// TODO: [Discuss Thread Ideal Processor]
+// TODO: [Discuss Affinity and Processor Groups]
 //
 //
 void ProcessManager::SetPriorityClass(DWORD newPriority) {
@@ -360,6 +360,7 @@ void ProcessManager::CreateSpoofedPProcess(const std::wstring& exePath, const DW
 
 }
 
+// (1). Returns the corresponding string for the particular priority value.
 const wchar_t* ProcessManager::getPriorityText(const DWORD priorityValue) const {
 	switch (priorityValue) {
 	case IDLE_PRIORITY_CLASS:
