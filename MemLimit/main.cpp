@@ -35,7 +35,7 @@ int wmain(const int argc, const wchar_t* argv[]) {
 
 
 	jobLimitInfoEx.BasicLimitInformation.LimitFlags = JOB_OBJECT_LIMIT_PROCESS_MEMORY;
-	jobLimitInfoEx.ProcessMemoryLimit = maxCommitMemory * (1024);
+	jobLimitInfoEx.ProcessMemoryLimit = static_cast<std::size_t>(maxCommitMemory) * (1024);
 	if (!::SetInformationJobObject(hJob.get(),JobObjectExtendedLimitInformation, &jobLimitInfoEx, sizeof(JOBOBJECT_EXTENDED_LIMIT_INFORMATION))) {
 		printf("[-] Failed setting limits to job object\n");
 		return 1;

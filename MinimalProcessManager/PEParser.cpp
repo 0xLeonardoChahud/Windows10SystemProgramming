@@ -1,7 +1,10 @@
 #include "PEParser.h"
 
 
-PEParser::PEParser(const std::wstring& exePath) : ptrDosHeader(nullptr), ptrNtHeader(nullptr), ptrOptHeader(nullptr), exePath(L""), is64bitProcess(false), fileBuffer(nullptr) {
+PEParser::PEParser(
+	_In_ const std::wstring& exePath
+) : ptrDosHeader(nullptr), ptrNtHeader(nullptr), ptrOptHeader(nullptr), exePath(L""), is64bitProcess(false), fileBuffer(nullptr) 
+{
 	this->init();
 }
 
@@ -12,26 +15,26 @@ void PEParser::init()  {
 	if (!this->exePath.compare(L"(none)"))
 		return;
 	this->clean();
-	unsigned int headerSize{ sizeof(IMAGE_DOS_HEADER) + sizeof(IMAGE_NT_HEADERS64) + sizeof(IMAGE_OPTIONAL_HEADER64) };
+	DWORD headerSize{ sizeof(IMAGE_DOS_HEADER) + sizeof(IMAGE_NT_HEADERS64) + sizeof(IMAGE_OPTIONAL_HEADER64) };
 	HANDLE hFile{ nullptr };
 	bool error{ false };
 
 	this->fileBuffer.reset(new byte[headerSize + 1]);
 	if (fileBuffer == nullptr) {
-		printf("[-] Failed reading exe PE header\n");
+		::wprintf(L"[-] Failed reading exe PE header\n");
 		error = true;
 		goto Exit;
 	}
 
 	hFile = ::CreateFile(this->exePath.data(), FILE_READ_ACCESS, 0, nullptr, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, nullptr);
 	if (hFile == INVALID_HANDLE_VALUE) {
-		printf("[-] Failed opening file for read : %u\n", ::GetLastError());
+		::wprintf(L"[-] Failed opening file for read : %u\n", ::GetLastError());
 		error = true;
 		goto Exit;
 	}
 
 	if (!::ReadFile(hFile, this->fileBuffer.get(), headerSize, nullptr, nullptr)) {
-		printf("[-] Failed reading file : %u\n", ::GetLastError());
+		::wprintf(L"[-] Failed reading file : %u\n", ::GetLastError());
 		error = true;
 		goto Exit;
 	}
@@ -41,7 +44,7 @@ void PEParser::init()  {
 	this->ptrOptHeader = static_cast<PIMAGE_OPTIONAL_HEADER>(&this->ptrNtHeader->OptionalHeader);
 	
 	this->is64bitProcess = (this->ptrOptHeader->Magic == IMAGE_NT_OPTIONAL_HDR64_MAGIC) ? true : false;
-	printf("MAGIC: 0x%x", this->ptrOptHeader->Magic);
+	::wprintf(L"MAGIC: 0x%x", this->ptrOptHeader->Magic);
 
 	Exit:
 		if (fileBuffer && error) {
@@ -56,7 +59,10 @@ void PEParser::init()  {
 
 }
 
-void PEParser::Reload(const std::wstring& newExePath) {
+void PEParser::Reload(
+	_In_ const std::wstring& newExePath
+) 
+{
 	this->exePath = newExePath;
 	this->init();
 }

@@ -14,6 +14,8 @@
 #include <Windows.h>
 #include "Wrappers.h"
 
+
+
 enum ATOMIC_OPS { NO_ATOMIC = 1, ATOM_INTERLOCKED_INC, ATOM_CRITICAL_SECTION};
 
 // Structure that will be shared by the threads.

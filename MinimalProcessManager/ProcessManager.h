@@ -17,19 +17,19 @@ private:
 	static void* ptrResumeProcess;
 	
 	void Cleanup(void);
-	HANDLE getHandleFromPid(const DWORD pid);
-	const std::wstring getImagePathName(const HANDLE hProcess);
-	DWORD GetProcessIdByName(const std::wstring& procName);
-	const wchar_t* getPriorityText(const DWORD priorityValue) const;
+	HANDLE getHandleFromPid(_In_ const DWORD pid);
+	const std::wstring getImagePathName(_In_ const HANDLE hProcess);
+	DWORD GetProcessIdByName(_In_ const std::wstring& procName) const;
+	const wchar_t* getPriorityText(_In_ const DWORD priorityValue) const;
 
 
 	
 
 public:
-	ProcessManager(const DWORD pid = 0);
+	ProcessManager(_In_ const DWORD pid = 0);
 	~ProcessManager();
-	void UpdateProcess(const DWORD pid);
-	void UpdateProcess(const std::wstring& procName);
+	void UpdateProcess(_In_ const DWORD pid);
+	void UpdateProcess(_In_ const std::wstring& procName);
 
 	
 	// Getters
@@ -39,16 +39,16 @@ public:
 
 
 	// Functionality
-	DWORD DisplayProcessList(const bool filter = false, const std::wstring& procName = L"(none)") const;
+	DWORD DisplayProcessList(_In_ const bool filter = false, _In_ const std::wstring& procName = L"(none)") const;
 	void DisplayProcessInfo(void) const;
-	void TerminateProcess(DWORD exitCode = 0);
+	void TerminateProcess(_In_ const DWORD exitCode = 0);
 	void SuspendProcess(void);
 	void ResumeProcess(void);
-	void SetPriorityClass(DWORD newPriority);
+	void SetPriorityClass(_In_ const DWORD newPriority);
 
 	// Peripherical Functionality
-	void CreateSpoofedPProcess(const std::wstring& processPath, const std::wstring& parentProcessPath);
-	void CreateSpoofedPProcess(const std::wstring& processPath, const DWORD pid);
+	void CreateSpoofedPProcess(_In_ const std::wstring& processPath, _In_ const std::wstring& parentProcessPath);
+	void CreateSpoofedPProcess(_In_ const std::wstring& processPath, _In_ const DWORD pid);
 	
 
 

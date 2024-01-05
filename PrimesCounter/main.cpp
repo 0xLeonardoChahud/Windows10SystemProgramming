@@ -4,7 +4,7 @@
 // Topics covered:
 // Chapter 5: Thread creation
 // Chapter 5: Waiting on waitable objects
-// Chapter 5: Thread functios prototypes
+// Chapter 5: Thread functions prototypes
 
 
 
@@ -15,9 +15,9 @@
 #include <Windows.h>
 
 typedef struct _INTERVAL_DATA_ {
-	unsigned int from;
-	unsigned int to;
-	unsigned int count;
+	uint64_t from;
+	uint64_t to;
+	uint64_t count;
 } INTERVAL_DATA, *PINTERVAL_DATA;
 
 
@@ -29,12 +29,12 @@ typedef struct _INTERVAL_DATA_ {
 // we rapidly conclude that if we vary the first factor up
 // then we have to vary the second factor down proportionally.
 // Because of that, there is at least one factor lesser than or equal to the sqrt(n).
-bool isPrime(unsigned int number) {
+bool isPrime(_In_ const uint64_t number) {
 	if (number < 2)
 		return false;
 
-	unsigned int limit{ static_cast<unsigned int>(::sqrt(number))};
-	for (unsigned int i = 2; i <= limit; i++) {
+	uint64_t limit{ static_cast<uint64_t>(::sqrt(number))};
+	for (std::size_t i = 2; i <= limit; i++) {
 		if (number % i == 0)
 			return false;
 	}
@@ -52,12 +52,12 @@ bool isPrime(unsigned int number) {
 // It is that type of question that the calling conventions aim to answer properly.
 // Finally, what we are saying with the WINAPI part is that the function CountPrimes will use the stdcall calling convention
 // and we do this because it is necessary according to the microsoft documentation for the CreateThread function.
-DWORD WINAPI CountPrimes(PVOID pParameter) {
+DWORD WINAPI CountPrimes(_Inout_ PVOID pParameter) {
 	PINTERVAL_DATA pData{ static_cast<PINTERVAL_DATA>(pParameter) };
-	unsigned int count{ 0 };
-	unsigned int from{ pData->from };
-	unsigned int to{ pData->to };
-	for (unsigned int i = from; i <= to; i++) {
+	DWORD count{ 0 };
+	uint64_t from{ pData->from };
+	uint64_t to{ pData->to };
+	for (std::size_t i = from; i <= to; i++) {
 		if (isPrime(i)) {
 			count++;
 		}
@@ -71,25 +71,25 @@ int wmain(const int argc, const wchar_t* argv[]) {
 
 	// Usage PrimesCounter.exe <from> <to> <threads>
 	if (argc < 4) {
-		printf("[ info ] Usage: PrimesCounter.exe <from> <to> <threads>\n");;
+		::wprintf(L"[ info ] Usage: PrimesCounter.exe <from> <to> <threads>\n");;
 		return 1;
 	}
 
 	// perThread -> stores how many numbers each thread will check.
 	// restPerThread -> additional numbers for each thread to check.
-	unsigned int totalPrimes{ 0 };
-	unsigned int from{ static_cast<unsigned int>(_wtoi(argv[1])) };
-	unsigned int to{ static_cast<unsigned int>(_wtoi(argv[2])) };
-	unsigned int nThreads{ static_cast<unsigned int>(_wtoi(argv[3])) };
-	unsigned int perThread{ static_cast<unsigned int>((to - from + 1) / nThreads) };
-	unsigned int restPerThread{ static_cast<unsigned int>((to - from + 1) % nThreads) };
+	uint64_t totalPrimes{ 0 };
+	uint64_t from{ static_cast<uint64_t>(::_wtoi(argv[1])) };
+	uint64_t to{ static_cast<uint64_t>(::_wtoi(argv[2])) };
+	uint8_t nThreads{ static_cast<uint8_t>(::_wtoi(argv[3])) };
+	uint64_t perThread{ static_cast<uint64_t>((to - from + 1) / nThreads) };
+	uint64_t restPerThread{ static_cast<uint64_t>((to - from + 1) % nThreads) };
 	DWORD currentThreadId{ 0 };
-	ULONG startTime{ 0 };
-	ULONG endTime{ 0 };
+	ULONGLONG startTime{ 0 };
+	ULONGLONG endTime{ 0 };
 
 	// Check parameters
 	if ((nThreads < 1 || nThreads > 64) || (from < 1) || (to < 1)) {
-		printf("[-] Invalid parameters specified\n");
+		::wprintf(L"[-] Invalid parameters specified\n");
 		return 1;
 	}
 
@@ -104,8 +104,8 @@ int wmain(const int argc, const wchar_t* argv[]) {
 	
 	// We are considering closed intervals (containing the numbers from each end)
 	// We also need tidx (thread index) to go through the ptrIntervalData and ptrHandleList sequentially
-	printf("\t%-25s%-20s\n", "Thread Id", "Interval");
-	for (unsigned int i = from, tidx = 0; i <= to; tidx++) {
+	::wprintf(L"\t%-25ws%-20ws\n", L"Thread Id", L"Interval");
+	for (std::size_t i = from, tidx = 0; i <= to; tidx++) {
 		
 		// If restPerThread == 0 then each thread received an equal number of numbers to verify
 		// Otherwise, we add one number sequentially until there are no more numbers to count.
@@ -127,11 +127,11 @@ int wmain(const int argc, const wchar_t* argv[]) {
 		// Creates thread
 		ptrHandleList[tidx] = ::CreateThread(nullptr, 0, CountPrimes, &ptrIntervalData[tidx], 0, &currentThreadId);
 		if (!ptrHandleList[tidx]) {
-			printf("[-] Failed creating thread: %u", ::GetLastError());
+			::wprintf(L"[-] Failed creating thread: %u", ::GetLastError());
 			break;
 		}
 
-		printf("\t%-25u [%d,%d]\n", currentThreadId, ptrIntervalData[tidx].from, ptrIntervalData[tidx].to);
+		::wprintf(L"\t%-25u [%I64u,%I64u]\n", currentThreadId, ptrIntervalData[tidx].from, ptrIntervalData[tidx].to);
 		currentThreadId = 0;
 
 	}
@@ -140,7 +140,7 @@ int wmain(const int argc, const wchar_t* argv[]) {
 	::WaitForMultipleObjects(nThreads, ptrHandleList.get(), TRUE, INFINITE);
 
 	// Aggregate each threads work
-	for (unsigned int i = 0; i < nThreads; i++) {
+	for (std::size_t i = 0; i < nThreads; i++) {
 		totalPrimes += ptrIntervalData[i].count;
 		if (ptrHandleList[i])
 			::CloseHandle(ptrHandleList[i]);
@@ -150,7 +150,7 @@ int wmain(const int argc, const wchar_t* argv[]) {
 	endTime = ::GetTickCount64();
 	
 	// Display information
-	printf("\nInterval: %d, Threads: %d\nTotal primes: %u, Elapsed: %u msec\n", (to - from + 1), nThreads, totalPrimes, (endTime - startTime));
+	::wprintf(L"\nInterval: %I64u, Threads: %lu\nTotal primes: %I64u, Elapsed: %llu msec\n", (to - from + 1), nThreads, totalPrimes, (endTime - startTime));
 	
 	return 0;
 }

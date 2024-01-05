@@ -15,13 +15,16 @@
 #include <cctype>
 
 // Polymorphic getInput functions that enables us to obtain user input.
-void getInput(const std::wstring& prefix, std::wstring& s) {
+void getInput(
+	_In_ const std::wstring& prefix, 
+	_Out_ std::wstring& s) 
+{
 	while (true) {
-		printf("%ws", prefix.data());
+		::wprintf(L"%ws", prefix.data());
 		if (!(std::wcin >> s)) {
 			std::cin.clear();
 			std::cin.ignore((std::numeric_limits<std::streamsize>::max)(), '\n');
-			printf("[-] Invalid option selected. Try Again.\n");
+			::wprintf(L"[-] Invalid option selected. Try Again.\n");
 			continue;
 		}
 		break;
@@ -29,14 +32,17 @@ void getInput(const std::wstring& prefix, std::wstring& s) {
 }
 
 template <typename T>
-void getInput(const std::wstring& prefix, T& p) {
+void getInput(
+	_In_ const std::wstring& prefix, 
+	_Out_ T& p) 
+{
 	while (true) {
-		printf("%ws", prefix.data());
+		::wprintf(L"%ws", prefix.data());
 		if (!(std::cin >> p)) {
 			system("cls");
 			std::cin.clear();
 			std::cin.ignore((std::numeric_limits<std::streamsize>::max)(), '\n');
-			printf("[-] Invalid option selected. Try Again.\n");
+			::wprintf(L"[-] Invalid option selected. Try Again.\n");
 			continue;
 		}
 		break;
@@ -156,11 +162,11 @@ int wmain(const int argc, const wchar_t* argv[]) {
 		case 9:
 			break;
 		default:
-			printf("[-] Invalid option specified\n");
+			::wprintf(L"[-] Invalid option specified\n");
 			break;
 		}
 
-		printf("\n\n\n");
+		::wprintf(L"\n\n\n");
 		procId = 0;
 	}
 	

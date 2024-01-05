@@ -15,10 +15,10 @@ private:
 	void init(void);
 
 public:
-	PEParser(const std::wstring& exePath);
+	PEParser( _In_ const std::wstring& exePath);
 	~PEParser();
 
-	void Reload(const std::wstring& exePath);
+	void Reload(_In_ const std::wstring& exePath);
 
 	bool is64bit(void) const { return this->is64bitProcess; }
 	void clean(void);

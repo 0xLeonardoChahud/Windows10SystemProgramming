@@ -19,7 +19,7 @@ void* ProcessManager::ptrSuspendProcess = nullptr;
 // related functions.
 // We also try to get the full path of the executable used to create the process specified by the user.
 // Finally, we trunk imagePathName so we can store just the executable name, without its full path.
-ProcessManager::ProcessManager(const DWORD pid) : processId(pid), 
+ProcessManager::ProcessManager(_In_ const DWORD pid) : processId(pid), 
 							   hProcess(nullptr), 
 							   imagePathName(L"(none)"), 
 							   processName(L"(none)"), peParser(imagePathName) {
@@ -28,7 +28,7 @@ ProcessManager::ProcessManager(const DWORD pid) : processId(pid),
 	if (ptrSuspendProcess == nullptr || ptrResumeProcess == nullptr) {
 		HMODULE hNtdll = ::GetModuleHandle(L"ntdll.dll");
 		if (!hNtdll) {
-			printf("[-] Failed setting up suspend/resume functionality\n");
+			::wprintf(L"[-] Failed setting up suspend/resume functionality\n");
 			return;
 		}
 
@@ -56,7 +56,7 @@ ProcessManager::~ProcessManager() {
 // (1). This function just exists to enable the programmer who is using our class
 // to update the current process based on a process name instead of a process id
 // giving the ProcessManager class more versatility.
-void ProcessManager::UpdateProcess(const std::wstring& procName) {
+void ProcessManager::UpdateProcess(_In_ const std::wstring& procName) {
 	// (1)
 	this->UpdateProcess(this->GetProcessIdByName(procName));
 }
@@ -68,7 +68,7 @@ void ProcessManager::UpdateProcess(const std::wstring& procName) {
 // (2). We update each member variable and do some error checking.
 // (3). We also reload the PEParser class instance so it refers to the executable currently
 // specified.
-void ProcessManager::UpdateProcess(const DWORD pid) {
+void ProcessManager::UpdateProcess(_In_ const DWORD pid) {
 	// (1)
 	this->Cleanup();
 	
@@ -88,11 +88,11 @@ void ProcessManager::UpdateProcess(const DWORD pid) {
 
 // (1). Function that returns a handle to a process object
 // using the process identifier (pid).
-HANDLE ProcessManager::getHandleFromPid(const DWORD pid) {
+HANDLE ProcessManager::getHandleFromPid(_In_ const DWORD pid) {
 	// (1)
 	HANDLE hTemp = ::OpenProcess(PROCESS_ALL_ACCESS, FALSE, pid);
 	if (!hTemp) {
-		printf("[-] Failed acquiring handle to process\n");
+		::wprintf(L"[-] Failed acquiring handle to process\n");
 		return nullptr;
 	}
 	return hTemp;
@@ -100,14 +100,14 @@ HANDLE ProcessManager::getHandleFromPid(const DWORD pid) {
 
 // (1). We obtain the full path of the executable file associated with the
 // loaded process image.
-const std::wstring ProcessManager::getImagePathName(const HANDLE _hProcess) {
+const std::wstring ProcessManager::getImagePathName(_In_ const HANDLE _hProcess) {
 	// (1)
 	DWORD pathSize{ MAX_PATH };
 	std::wstring _imagePathName;
-	_imagePathName.resize(pathSize + 1);
+	_imagePathName.resize(static_cast<std::size_t>(pathSize) + 1);
 
 	if (!::QueryFullProcessImageName(_hProcess, 0, const_cast<PWSTR>(_imagePathName.data()), &pathSize)) {
-		printf("[-] Failed acquiring process image\n");
+		::wprintf(L"[-] Failed acquiring process image\n");
 		::CloseHandle(_hProcess);
 		return L"(none)";
 	}
@@ -142,7 +142,7 @@ void ProcessManager::Cleanup(void) {
 // In case the filter is on AND the user has specified a valid process name (we never know),
 // then we compare with the current process name being displayed and, if they match, we return
 // the process id of that particular process beign searched.
-DWORD ProcessManager::DisplayProcessList(const bool filter, const std::wstring& targetProcName) const {
+DWORD ProcessManager::DisplayProcessList(_In_ const bool filter, _In_ const std::wstring& targetProcName) const {
 	// (1)
 	PROCESS_INFORMATION procInfo{ 0 };
 	PROCESSENTRY32W procEntry{ 0 };
@@ -155,7 +155,7 @@ DWORD ProcessManager::DisplayProcessList(const bool filter, const std::wstring& 
 	// (2)
 	hSnapshot = ::CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
 	if (!hSnapshot) {
-		printf("[-] Failed acquiring snapshot for process list\n");
+		::wprintf(L"[-] Failed acquiring snapshot for process list\n");
 		return 0;
 	}
 
@@ -163,11 +163,11 @@ DWORD ProcessManager::DisplayProcessList(const bool filter, const std::wstring& 
 	::Process32First(hSnapshot, &procEntry);
 	
 	if (!filter)
-		printf("\t%-20s%-20s\n", "Process Id", "Image Name");
+		::wprintf(L"\t%-20ws%-20ws\n", L"Process Id", L"Image Name");
 	
 	do {
 		if (!filter)
-			printf("\t%-20u%-20ws\n", procEntry.th32ProcessID, procEntry.szExeFile);
+			::wprintf(L"\t%-20u%-20ws\n", procEntry.th32ProcessID, procEntry.szExeFile);
 		if (filter && targetProcName.compare(L"(none)")) {
 			if (!targetProcName.compare(procEntry.szExeFile)) {
 				::CloseHandle(hSnapshot);
@@ -201,22 +201,22 @@ void ProcessManager::DisplayProcessInfo(void) const {
 		priorityClass = this->getPriorityText(::GetPriorityClass(this->hProcess));
 	}
 
-	printf("- - - - - PROCESS INFORMATION - - - - -\n");
-	printf("Process Id: %u\nProcess Name: %ws\nImage Full Path: %ws\nPriority Class: %ws\nHandle Count: %u\nMinimum Working Set Size: %u\nMaximum Working Set Size: %u\n64-bit: %u\n", 
+	::wprintf(L"- - - - - PROCESS INFORMATION - - - - -\n");
+	::wprintf(L"Process Id: %u\nProcess Name: %ws\nImage Full Path: %ws\nPriority Class: %ws\nHandle Count: %u\nMinimum Working Set Size: %I64u\nMaximum Working Set Size: %I64u\n64-bit: %u\n", 
 			this->processId, this->processName.data(), this->imagePathName.data(), priorityClass.data(), handleCount, minWorkSize, maxWorkSize, is64bit);
-	printf("- - - - - - - - - - - - - - - - - - - -");
+	::wprintf(L"- - - - - - - - - - - - - - - - - - - -");
 }
 
 // (1). This is a wrapper function that calls DisplayProcessList with the filtering
 // mode enabled. It allows using this member function to obtain process id based
 // only on a process name.
-DWORD ProcessManager::GetProcessIdByName(const std::wstring& procName) {
+DWORD ProcessManager::GetProcessIdByName(_In_ const std::wstring& procName) const {
 	return this->DisplayProcessList(true, procName);
 }
 
 // (1). Nothing special here. We just call the documented TerminateFunction passing
 // the process handle that the class currently stores.
-void ProcessManager::TerminateProcess(DWORD ExitCode) {
+void ProcessManager::TerminateProcess(_In_ const DWORD ExitCode) {
 	::TerminateProcess(this->hProcess, ExitCode);
 	this->Cleanup();
 }
@@ -279,14 +279,14 @@ void ProcessManager::ResumeProcess(void) {
 // TODO: [Discuss Affinity and Processor Groups]
 //
 //
-void ProcessManager::SetPriorityClass(DWORD newPriority) {
+void ProcessManager::SetPriorityClass(_In_ const DWORD newPriority) {
 	if (this->hProcess)
 		::SetPriorityClass(this->hProcess, newPriority);
 }
 
 // (1). Function that creates a process with a fake parent process id (you can see the process three with ProcessExplorer.exe)
 // This function is just a wrapper that allows executing with two string parameters.
-void ProcessManager::CreateSpoofedPProcess(const std::wstring& processPath, const std::wstring& parentProcessPath) {
+void ProcessManager::CreateSpoofedPProcess(_In_ const std::wstring& processPath, _In_ const std::wstring& parentProcessPath) {
 	this->CreateSpoofedPProcess(processPath, this->GetProcessIdByName(parentProcessPath));
 }
 
@@ -295,7 +295,7 @@ void ProcessManager::CreateSpoofedPProcess(const std::wstring& processPath, cons
 // (3). Update the process and thread attribute list with PROC_THREAD_ATTRIBUTE_PARENT_PROCESS
 // passing the parent process handle as parameter. Finally, it creates the process with the
 // extended version of startup info.
-void ProcessManager::CreateSpoofedPProcess(const std::wstring& exePath, const DWORD pid) {
+void ProcessManager::CreateSpoofedPProcess(_In_ const std::wstring& exePath, _In_ const DWORD pid) {
 	
 	// (1)
 	// These variables need to be nonconst due to CreateProcess documentation. So we pass them to the stack without const modifier.
@@ -312,7 +312,7 @@ void ProcessManager::CreateSpoofedPProcess(const std::wstring& exePath, const DW
 
 	hParent = ::OpenProcess(PROCESS_CREATE_PROCESS, FALSE, parentPid);
 	if (!hParent) {
-		printf("[-] Unable to acquire handle for parent process\n");
+		::wprintf(L"[-] Unable to acquire handle for parent process\n");
 		return;
 	}
 
@@ -322,13 +322,13 @@ void ProcessManager::CreateSpoofedPProcess(const std::wstring& exePath, const DW
 	procThreadAttr = (LPPROC_THREAD_ATTRIBUTE_LIST)(new byte[procThreadAttrListSize]);
 
 	if (!::InitializeProcThreadAttributeList(procThreadAttr, 1, 0, &procThreadAttrListSize)) {
-		printf("[-] Failed to initialize process_thread_attribute list\n");
+		::wprintf(L"[-] Failed to initialize process_thread_attribute list\n");
 		goto Cleanup;
 	}
 
 	// (3)
 	if (!::UpdateProcThreadAttribute(procThreadAttr, 0, PROC_THREAD_ATTRIBUTE_PARENT_PROCESS, &hParent, sizeof(HANDLE), nullptr, nullptr)) {
-		printf("[-] Failed initializing proc_thread_attr values\n");
+		::wprintf(L"[-] Failed initializing proc_thread_attr values\n");
 		goto Cleanup;
 	}
 
@@ -336,12 +336,12 @@ void ProcessManager::CreateSpoofedPProcess(const std::wstring& exePath, const DW
 	procStartupInfoEx.StartupInfo.cb = sizeof(STARTUPINFOEXW);
 	procStartupInfoEx.lpAttributeList = procThreadAttr;
 	if (!::CreateProcess(nullptr, const_cast<PWSTR>(procPathCpy.data()), nullptr, nullptr, FALSE, EXTENDED_STARTUPINFO_PRESENT, nullptr, nullptr, reinterpret_cast<LPSTARTUPINFO>(&procStartupInfoEx), &procInfo)) {
-		printf("[-] Failed creating child process with modified parent process: %u\n", ::GetLastError());
+		::wprintf(L"[-] Failed creating child process with modified parent process: %u\n", ::GetLastError());
 		goto Cleanup;
 	}
 
 
-	printf("[+] Child process created with pid=%u\n", procInfo.dwProcessId);
+	::wprintf(L"[+] Child process created with pid=%u\n", procInfo.dwProcessId);
 
 	Cleanup:
 		if (hParent) {
@@ -349,7 +349,7 @@ void ProcessManager::CreateSpoofedPProcess(const std::wstring& exePath, const DW
 		}
 		if (procThreadAttr) {
 			::DeleteProcThreadAttributeList(procThreadAttr);
-			delete[] procThreadAttr;
+			// delete[] procThreadAttr;
 		}
 		if (procInfo.hProcess) {
 			::CloseHandle(procInfo.hProcess);
@@ -361,7 +361,7 @@ void ProcessManager::CreateSpoofedPProcess(const std::wstring& exePath, const DW
 }
 
 // (1). Returns the corresponding string for the particular priority value.
-const wchar_t* ProcessManager::getPriorityText(const DWORD priorityValue) const {
+const wchar_t* ProcessManager::getPriorityText(_In_ const DWORD priorityValue) const {
 	switch (priorityValue) {
 	case IDLE_PRIORITY_CLASS:
 		return L"Idle Priority Class (4)";
@@ -402,5 +402,7 @@ const wchar_t* ProcessManager::getPriorityText(const DWORD priorityValue) const 
 	case THREAD_PRIORITY_TIME_CRITICAL:
 		return L"Thread Relative Priority Below Normal (+15)";
 		break;
+	default:
+		return L"";
 	}
 }
