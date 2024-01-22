@@ -19,16 +19,21 @@ int wmain(const int argc, const wchar_t* const argv[]) {
 
 	std::wcout << L"[+] System initialization started" << std::endl;
 
-	std::unique_ptr<HANDLE[]> hThreads{ std::make_unique<HANDLE[]>(THREADS_NUMBER) };
+	HANDLE hThreads[4]{ nullptr };
 	uint8_t i{ 0 };
 	for (LPTHREAD_START_ROUTINE func : initSubsys) {
 		hThreads[i++] = ::CreateThread(nullptr, 0, func, &syncBarrier, 0, nullptr);
 	}
 
-	::WaitForMultipleObjects(THREADS_NUMBER, hThreads.get(), TRUE, INFINITE);
+	::WaitForMultipleObjects(THREADS_NUMBER, hThreads, TRUE, INFINITE);
 
 	std::wcout << L"[+] System initialization complete" << std::endl;
 
+	::DeleteSynchronizationBarrier(&syncBarrier);
+	for (HANDLE ht : hThreads) {
+		if (ht)
+			::CloseHandle(ht);
+	}
 
 
 
