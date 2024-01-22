@@ -52,8 +52,9 @@ void getInput(
 
 // The wmain function implements all the logic around gathering user input
 // to be used for the ProcessManager class.
-int wmain(const int argc, const wchar_t* argv[]) {
-	
+int wmain(const int argc, const wchar_t* const argv[]) {
+	UNREFERENCED_PARAMETER(argc);
+	UNREFERENCED_PARAMETER(argv);
 	// We will need one instance of this class
 	ProcessManager procMg;
 	

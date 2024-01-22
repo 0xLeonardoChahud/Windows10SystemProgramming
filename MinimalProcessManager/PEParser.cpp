@@ -5,6 +5,7 @@ PEParser::PEParser(
 	_In_ const std::wstring& exePath
 ) : ptrDosHeader(nullptr), ptrNtHeader(nullptr), ptrOptHeader(nullptr), exePath(L""), is64bitProcess(false), fileBuffer(nullptr) 
 {
+	UNREFERENCED_PARAMETER(exePath);
 	this->init();
 }
 
@@ -15,7 +16,7 @@ void PEParser::init()  {
 	if (!this->exePath.compare(L"(none)"))
 		return;
 	this->clean();
-	DWORD headerSize{ sizeof(IMAGE_DOS_HEADER) + sizeof(IMAGE_NT_HEADERS64) + sizeof(IMAGE_OPTIONAL_HEADER64) };
+	const DWORD headerSize{ sizeof(IMAGE_DOS_HEADER) + sizeof(IMAGE_NT_HEADERS64) + sizeof(IMAGE_OPTIONAL_HEADER64) };
 	HANDLE hFile{ nullptr };
 	bool error{ false };
 
@@ -67,7 +68,7 @@ void PEParser::Reload(
 	this->init();
 }
 
-void PEParser::clean(void) {
+void PEParser::clean(void) noexcept {
 	if (this->fileBuffer) {
 		this->fileBuffer.reset(nullptr);
 	}

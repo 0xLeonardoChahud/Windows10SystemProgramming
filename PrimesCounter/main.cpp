@@ -67,7 +67,7 @@ DWORD WINAPI CountPrimes(_Inout_ PVOID pParameter) {
 	return count;
 }
 
-int wmain(const int argc, const wchar_t* argv[]) {
+int wmain(const int argc, const wchar_t* const argv[]) {
 
 	// Usage PrimesCounter.exe <from> <to> <threads>
 	if (argc < 4) {
@@ -94,10 +94,10 @@ int wmain(const int argc, const wchar_t* argv[]) {
 	}
 
 	// We will need one handle for each thread obviously.
-	std::unique_ptr ptrHandleList{ std::make_unique<HANDLE[]>(nThreads) };
+	std::unique_ptr<HANDLE[]> ptrHandleList{ std::make_unique<HANDLE[]>(nThreads) };
 
 	// For each thread, we will also need an INTERVAL_DATA structure to store how many primes were count.
-	std::unique_ptr ptrIntervalData{ std::make_unique<INTERVAL_DATA[]>(nThreads) };
+	std::unique_ptr<INTERVAL_DATA[]> ptrIntervalData{ std::make_unique<INTERVAL_DATA[]>(nThreads) };
 
 	// Get current time
 	startTime = ::GetTickCount64();

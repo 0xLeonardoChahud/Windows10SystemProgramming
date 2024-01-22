@@ -20,6 +20,6 @@ public:
 
 	void Reload(_In_ const std::wstring& exePath);
 
-	bool is64bit(void) const { return this->is64bitProcess; }
-	void clean(void);
+	bool is64bit(void) const noexcept { return this->is64bitProcess; }
+	void clean(void) noexcept;
 };
