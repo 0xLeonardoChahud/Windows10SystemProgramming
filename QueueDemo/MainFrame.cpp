@@ -63,6 +63,8 @@ void MainFrame::InitCtrls(void) {
 	stopBtn = new wxButton(mainPanel, wxID_ANY, wxT("Stop"), wxPoint(startBtn->GetPosition().x + 100, startBtn->GetPosition().y));
 	exitBtn = new wxButton(mainPanel, wxID_ANY, wxT("Exit"), wxPoint(715, startBtn->GetPosition().y));
 	clearBtn = new wxButton(mainPanel, wxID_ANY, wxT("Clear"), wxPoint(stopBtn->GetPosition().x + 100, stopBtn->GetPosition().y));
+
+	CreateStatusBar();
 }
 
 void MainFrame::BindCtrls(void) {
@@ -108,10 +110,12 @@ void MainFrame::OnStartBtnClicked(wxCommandEvent& evt) {
 	MainSimulation.StartSimulation(nConsumers, nProducers, producedView, processedView);
 	numberProdcuersLabel->SetLabelText(wxString::Format("Number of Producer Threads: %u", MainSimulation.getNumberProducers()));
 	numberConsumersLabel->SetLabelText(wxString::Format("Number of Consumer Threads: %u", MainSimulation.getNumberConsumers()));
+	SetStatusText(wxT("Status: Running"));
 }
 
 void MainFrame::OnStopBtnClicked(wxCommandEvent& evt) {
 	MainSimulation.StopSimulation();
+	SetStatusText(wxT("Status: Stopped"));
 }
 
 void MainFrame::OnProcessedListInsert(wxEvent& evt) {
@@ -124,6 +128,8 @@ void MainFrame::OnClearBtnClicked(wxCommandEvent& evt) {
 	producedView->DeleteAllItems();
 	consumerSpinCtrl->SetValue(1);
 	producerSpinCtrl->SetValue(1);
+	MainSimulation.StopSimulation();
+	SetStatusText(wxT("Status: Stopped"));
 }
 
 
