@@ -33,7 +33,7 @@ bool isPrime(_In_ const uint64_t number) {
 	if (number < 2)
 		return false;
 
-	uint64_t limit{ static_cast<uint64_t>(::sqrt(number))};
+	const uint64_t limit{ static_cast<uint64_t>(::sqrt(number))};
 	for (std::size_t i = 2; i <= limit; i++) {
 		if (number % i == 0)
 			return false;
@@ -55,8 +55,8 @@ bool isPrime(_In_ const uint64_t number) {
 DWORD WINAPI CountPrimes(_Inout_ PVOID pParameter) {
 	PINTERVAL_DATA pData{ static_cast<PINTERVAL_DATA>(pParameter) };
 	DWORD count{ 0 };
-	uint64_t from{ pData->from };
-	uint64_t to{ pData->to };
+	const uint64_t from{ pData->from };
+	const uint64_t to{ pData->to };
 	for (std::size_t i = from; i <= to; i++) {
 		if (isPrime(i)) {
 			count++;
@@ -78,10 +78,10 @@ int wmain(const int argc, const wchar_t* const argv[]) {
 	// perThread -> stores how many numbers each thread will check.
 	// restPerThread -> additional numbers for each thread to check.
 	uint64_t totalPrimes{ 0 };
-	uint64_t from{ static_cast<uint64_t>(::_wtoi(argv[1])) };
-	uint64_t to{ static_cast<uint64_t>(::_wtoi(argv[2])) };
-	uint8_t nThreads{ static_cast<uint8_t>(::_wtoi(argv[3])) };
-	uint64_t perThread{ static_cast<uint64_t>((to - from + 1) / nThreads) };
+	const uint64_t from{ static_cast<uint64_t>(::_wtoi(argv[1])) };
+	const uint64_t to{ static_cast<uint64_t>(::_wtoi(argv[2])) };
+	const uint8_t nThreads{ static_cast<uint8_t>(::_wtoi(argv[3])) };
+	const uint64_t perThread{ static_cast<uint64_t>((to - from + 1) / nThreads) };
 	uint64_t restPerThread{ static_cast<uint64_t>((to - from + 1) % nThreads) };
 	DWORD currentThreadId{ 0 };
 	ULONGLONG startTime{ 0 };
