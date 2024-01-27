@@ -28,7 +28,7 @@ int wmain(const int argc, const wchar_t* const argv[]) {
 	sysTime.wSecond = 0;
 	sysTime.wMilliseconds = 0;
 
-	// Translate to local time zone
+	// Translate local time to UTC
 	::TzSpecificLocalTimeToSystemTime(nullptr, &sysTime, &sysTime);
 
 	// Converts to FILETIME
