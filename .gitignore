@@ -361,3 +361,11 @@ MigrationBackup/
 
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
+/AppsTests/AppsTests.vcxproj
+/AppsTests/AppsTests.vcxproj.filters
+/AppsTests/AppsTests.vcxproj
+/AppsTests/AppsTests.vcxproj.filters
+/AppsTests/packages.config
+/AppsTests/pch.cpp
+/AppsTests/pch.h
+/AppsTests/test.cpp
