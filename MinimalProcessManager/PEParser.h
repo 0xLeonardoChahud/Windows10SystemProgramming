@@ -2,6 +2,7 @@
 #include <string>
 #include <memory>
 #include <Windows.h>
+#include <wil/resource.h>
 
 class PEParser {
 private:

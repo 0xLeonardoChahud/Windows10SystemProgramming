@@ -103,15 +103,15 @@ HANDLE ProcessManager::getHandleFromPid(_In_ const DWORD pid) {
 const std::wstring ProcessManager::getImagePathName(_In_ const HANDLE _hProcess) {
 	// (1)
 	DWORD pathSize{ MAX_PATH };
-	std::wstring _imagePathName;
-	_imagePathName.resize(static_cast<std::size_t>(pathSize) + 1);
-
-	if (!::QueryFullProcessImageName(_hProcess, 0, const_cast<PWSTR>(_imagePathName.data()), &pathSize)) {
+	std::unique_ptr<wchar_t[]> wcImgPathName{ std::make_unique<wchar_t[]>(pathSize) };
+	
+	if (!::QueryFullProcessImageName(_hProcess, 0, wcImgPathName.get(), &pathSize)) {
 		::wprintf(L"[-] Failed acquiring process image\n");
 		::CloseHandle(_hProcess);
 		return L"(none)";
 	}
 
+	std::wstring _imagePathName(wcImgPathName.get());
 	return _imagePathName;
 }
 
@@ -190,7 +190,7 @@ void ProcessManager::DisplayProcessInfo(void) const {
 	std::wstring priorityClass{ L"(none)"};
 	DWORD handleCount{ 0 };
 	BOOL priorityBoost{ FALSE };
-	bool is64bit{ this->peParser.is64bit() };
+	const bool is64bit{ this->is64BitProcess() };
 	SIZE_T minWorkSize{ 0 };
 	SIZE_T maxWorkSize{ 0 };
 

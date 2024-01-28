@@ -21,10 +21,7 @@ private:
 	const std::wstring getImagePathName(_In_ const HANDLE hProcess);
 	DWORD GetProcessIdByName(_In_ const std::wstring& procName) const;
 	const wchar_t* getPriorityText(_In_ const DWORD priorityValue) const;
-
-
 	
-
 public:
 	ProcessManager(_In_ const DWORD pid = 0);
 	~ProcessManager();
@@ -33,9 +30,10 @@ public:
 
 	
 	// Getters
-	const std::wstring& getProcessName(void) const { return this->processName; }
-	const std::wstring& getImagePath(void) const { return this->imagePathName; }
-	DWORD getProcessId(void) const { return this->processId; }
+	const std::wstring& getProcessName(void) const noexcept { return this->processName; }
+	const std::wstring& getImagePath(void) const noexcept { return this->imagePathName; }
+	DWORD getProcessId(void) const noexcept { return this->processId; }
+	bool is64BitProcess(void) const noexcept { return peParser.is64bit(); }
 
 
 	// Functionality

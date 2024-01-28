@@ -1,11 +1,9 @@
 #include "PEParser.h"
 
-
 PEParser::PEParser(
 	_In_ const std::wstring& exePath
-) : ptrDosHeader(nullptr), ptrNtHeader(nullptr), ptrOptHeader(nullptr), exePath(L""), is64bitProcess(false), fileBuffer(nullptr) 
+) : ptrDosHeader(nullptr), ptrNtHeader(nullptr), ptrOptHeader(nullptr), exePath(exePath), is64bitProcess(false), fileBuffer(nullptr) 
 {
-	UNREFERENCED_PARAMETER(exePath);
 	this->init();
 }
 
@@ -15,49 +13,51 @@ void PEParser::init()  {
 
 	if (!this->exePath.compare(L"(none)"))
 		return;
+
 	this->clean();
-	const DWORD headerSize{ sizeof(IMAGE_DOS_HEADER) + sizeof(IMAGE_NT_HEADERS64) + sizeof(IMAGE_OPTIONAL_HEADER64) };
-	HANDLE hFile{ nullptr };
+	
+	constexpr DWORD headerSize{ sizeof(IMAGE_DOS_HEADER) + sizeof(IMAGE_NT_HEADERS64) + sizeof(IMAGE_OPTIONAL_HEADER64) };
+	wil::unique_handle hFile{ nullptr };
 	bool error{ false };
 
-	this->fileBuffer.reset(new byte[headerSize + 1]);
-	if (fileBuffer == nullptr) {
-		::wprintf(L"[-] Failed reading exe PE header\n");
-		error = true;
-		goto Exit;
-	}
+	do {
+		this->fileBuffer = std::make_unique<byte[]>(headerSize + 1);
+		if (fileBuffer == nullptr) {
+			::wprintf(L"[-] Failed reading exe PE header\n");
+			error = true;
+			break;
+		}
 
-	hFile = ::CreateFile(this->exePath.data(), FILE_READ_ACCESS, 0, nullptr, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, nullptr);
-	if (hFile == INVALID_HANDLE_VALUE) {
-		::wprintf(L"[-] Failed opening file for read : %u\n", ::GetLastError());
-		error = true;
-		goto Exit;
-	}
+		hFile.reset(::CreateFile(this->exePath.data(), FILE_READ_ACCESS, 0, nullptr, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, nullptr));
+		if (hFile.get() == INVALID_HANDLE_VALUE) {
+			::wprintf(L"[-] Failed opening file for read : %u\n", ::GetLastError());
+			error = true;
+			break;
+		}
 
-	if (!::ReadFile(hFile, this->fileBuffer.get(), headerSize, nullptr, nullptr)) {
-		::wprintf(L"[-] Failed reading file : %u\n", ::GetLastError());
-		error = true;
-		goto Exit;
-	}
-
-	this->ptrDosHeader = (PIMAGE_DOS_HEADER)this->fileBuffer.get();
-	this->ptrNtHeader = (PIMAGE_NT_HEADERS)(this->ptrDosHeader->e_lfanew + static_cast<PBYTE>(this->fileBuffer.get()));
-	this->ptrOptHeader = static_cast<PIMAGE_OPTIONAL_HEADER>(&this->ptrNtHeader->OptionalHeader);
+		if (!::ReadFile(hFile.get(), this->fileBuffer.get(), headerSize, nullptr, nullptr)) {
+			::wprintf(L"[-] Failed reading file : %u\n", ::GetLastError());
+			error = true;
+			break;
+		}
+	} while (false);
 	
-	this->is64bitProcess = (this->ptrOptHeader->Magic == IMAGE_NT_OPTIONAL_HDR64_MAGIC) ? true : false;
-	::wprintf(L"MAGIC: 0x%x", this->ptrOptHeader->Magic);
-
-	Exit:
-		if (fileBuffer && error) {
+	if (error) {
+		if (fileBuffer) {
 			this->fileBuffer.reset(nullptr);
 		}
 
-		if (hFile) {
-			::CloseHandle(hFile);
-		}
+		return;
+	}
 
+	this->ptrDosHeader = reinterpret_cast<PIMAGE_DOS_HEADER>(this->fileBuffer.get());
+	this->ptrNtHeader = reinterpret_cast<PIMAGE_NT_HEADERS>(this->ptrDosHeader->e_lfanew + static_cast<PBYTE>(this->fileBuffer.get()));
+	this->ptrOptHeader = static_cast<PIMAGE_OPTIONAL_HEADER>(&this->ptrNtHeader->OptionalHeader);
 	
+	this->is64bitProcess = (this->ptrOptHeader->Magic == IMAGE_NT_OPTIONAL_HDR64_MAGIC) ? true : false;
+	// ::wprintf(L"MAGIC: 0x%x", this->ptrOptHeader->Magic);
 
+	this->fileBuffer.reset(nullptr);
 }
 
 void PEParser::Reload(

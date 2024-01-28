@@ -38,4 +38,7 @@
       <Filter>Arquivos de Recurso</Filter>
     </Image>
   </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
+  </ItemGroup>
 </Project>
