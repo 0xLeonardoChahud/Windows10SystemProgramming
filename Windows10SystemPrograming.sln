@@ -36,6 +36,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "AppsTests", "AppsTests\Apps
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SimpleWork", "SimpleWork\SimpleWork.vcxproj", "{3085C1E3-54BE-41C4-8A4F-23BD9B40B786}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Images", "Images", "{549B7F04-C7FD-433A-A543-17323D6910B7}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -159,6 +161,9 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{549B7F04-C7FD-433A-A543-17323D6910B7} = {DACD1CA9-FFAB-48E9-A501-E2AF6017850C}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {274CAF3D-363B-44CF-8332-B9ED82BB2063}

@@ -8,7 +8,6 @@ MainFrame::MainFrame() : wxFrame(nullptr, wxID_ANY, "Simple Work", wxDefaultPosi
 
 
 void MainFrame::InitCtrls() {
-
 	// Getting client size
 	const wxSize clientSize = this->GetClientSize();
 
@@ -26,7 +25,6 @@ void MainFrame::InitCtrls() {
 	_workItemsView = new wxListBox(_mainPanel, wxID_ANY, wxPoint(250, 40), wxSize(300, 200));
 
 	_updateTimer = new wxTimer(this, wxID_ANY);
-	
 }
 
 

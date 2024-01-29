@@ -8,7 +8,6 @@ public:
 	MainFrame();
 
 private:
-
 	// Functions
 	void InitCtrls();
 	void BindCtrls();
@@ -30,7 +29,6 @@ private:
 	void UpdateThreadNumber(const wxTimerEvent&);
 		
 private:
-	
 	// Controls
 	wxPanel* _mainPanel;
 
@@ -44,6 +42,5 @@ private:
 	wxListBox* _workItemsView;
 
 	wxTimer* _updateTimer;
-
 };
 

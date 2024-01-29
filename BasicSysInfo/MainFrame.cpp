@@ -30,7 +30,7 @@ void MainFrame::InitControls() {
 	windowsDirectoryLabel = new wxStaticText(mainPanel, wxID_ANY, wxString::Format("Windows Directory: %ws", bsi.getWindowsDirectory()), wxPoint(20, 230));
 
 	numberOfProcessorsLabel = new wxStaticText(mainPanel, wxID_ANY, wxString::Format("Number of logical processors: %u", bsi.getNumberOfProcessors()), wxPoint(20, 250));
-	sysRAMLabel = new wxStaticText(mainPanel, wxID_ANY, wxString::Format("Physicall RAM: %llu KB / %llu GB", bsi.getInstalledRAM(), RAM_GB), wxPoint(20, 270));
+	sysRAMLabel = new wxStaticText(mainPanel, wxID_ANY, wxString::Format("Physical RAM: %llu KB / %llu GB", bsi.getInstalledRAM(), RAM_GB), wxPoint(20, 270));
 	screenResolutionLabel = new wxStaticText(mainPanel, wxID_ANY, wxString::Format("Screen Resolution: %llu x %llu", bsi.getDisplayInfo().width, bsi.getDisplayInfo().height), wxPoint(20, 290));
 	localeNameLabel = new wxStaticText(mainPanel, wxID_ANY, wxString::Format("Locale Name: %ws", bsi.getLocaleName()), wxPoint(20, 310));
 	motherboardLabel = new wxStaticText(mainPanel, wxID_ANY, wxString::Format("Motherboard Manufacturer Name: %ws", bsi.getBaseboardManufacturer()), wxPoint(20, 330));
