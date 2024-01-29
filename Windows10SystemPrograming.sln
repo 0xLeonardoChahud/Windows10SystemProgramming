@@ -34,6 +34,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "WaitableTimer", "WaitableTi
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "AppsTests", "AppsTests\AppsTests.vcxproj", "{39CF56BB-950E-4DD6-AA3F-F46E9FA3BE0F}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SimpleWork", "SimpleWork\SimpleWork.vcxproj", "{3085C1E3-54BE-41C4-8A4F-23BD9B40B786}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -146,6 +148,14 @@ Global
 		{39CF56BB-950E-4DD6-AA3F-F46E9FA3BE0F}.Release|x64.Build.0 = Release|x64
 		{39CF56BB-950E-4DD6-AA3F-F46E9FA3BE0F}.Release|x86.ActiveCfg = Release|Win32
 		{39CF56BB-950E-4DD6-AA3F-F46E9FA3BE0F}.Release|x86.Build.0 = Release|Win32
+		{3085C1E3-54BE-41C4-8A4F-23BD9B40B786}.Debug|x64.ActiveCfg = Debug|x64
+		{3085C1E3-54BE-41C4-8A4F-23BD9B40B786}.Debug|x64.Build.0 = Debug|x64
+		{3085C1E3-54BE-41C4-8A4F-23BD9B40B786}.Debug|x86.ActiveCfg = Debug|Win32
+		{3085C1E3-54BE-41C4-8A4F-23BD9B40B786}.Debug|x86.Build.0 = Debug|Win32
+		{3085C1E3-54BE-41C4-8A4F-23BD9B40B786}.Release|x64.ActiveCfg = Release|x64
+		{3085C1E3-54BE-41C4-8A4F-23BD9B40B786}.Release|x64.Build.0 = Release|x64
+		{3085C1E3-54BE-41C4-8A4F-23BD9B40B786}.Release|x86.ActiveCfg = Release|Win32
+		{3085C1E3-54BE-41C4-8A4F-23BD9B40B786}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

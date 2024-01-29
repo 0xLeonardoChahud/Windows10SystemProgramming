@@ -9,7 +9,7 @@ uint64_t Simulation::_nConsumed{ 0 };
 HANDLE Simulation::_hAbortEvent{ nullptr };
 AutoCriticalSection Simulation::_acs;
 AutoConditionVariable Simulation::_acv;
-std::queue<Simulation::WORK_ITEM> Simulation::_workItens;
+std::queue<Simulation::WORK_ITEM> Simulation::_workItems;
 wxListCtrl* Simulation::_ptrConsumedView{ nullptr };
 wxListCtrl* Simulation::_ptrProducedView{ nullptr };
 
@@ -65,8 +65,8 @@ void Simulation::Cleanup(void) {
 	_hConsumers.reset(nullptr);
 	_hProducers.reset(nullptr);
 
-	while (!_workItens.empty()) {
-		_workItens.pop();
+	while (!_workItems.empty()) {
+		_workItems.pop();
 	}
 	
 	_ptrConsumedView = nullptr;
@@ -143,7 +143,7 @@ DWORD WINAPI Simulation::ProducerThread(LPVOID lpParam) {
 			abort = true;
 		}
 		_nProduced++;
-		_workItens.push(wi);
+		_workItems.push(wi);
 		
 		// UI Handling
 		int index = _ptrProducedView->GetItemCount();
@@ -180,12 +180,12 @@ DWORD WINAPI Simulation::ConsumerThread(LPVOID lpParam) {
 		}
 
 
-		while (_workItens.empty()) { 
+		while (_workItems.empty()) { 
 			::SleepConditionVariableCS(_acv.get(), _acs.get(), INFINITE);
 		}
 
-		WORK_ITEM wi = _workItens.front();
-		_workItens.pop();
+		WORK_ITEM wi = _workItems.front();
+		_workItems.pop();
 		wi.isPrime = isPrime(wi.number);
 		if (wi.isPrime)
 			_nPrimes++;

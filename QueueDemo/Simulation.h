@@ -84,7 +84,7 @@ private:
 
 
 	// Static vars
-	static std::queue<WORK_ITEM> _workItens;
+	static std::queue<WORK_ITEM> _workItems;
 	static AutoCriticalSection _acs;
 	static AutoConditionVariable _acv;
 	static uint64_t _nPrimes;
