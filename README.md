@@ -9,7 +9,7 @@
   <img alt="" src="https://img.shields.io/github/stars/0xLeonardoChahud/Windows10SystemProgramming?style=flat">
 </p>
 <p align="center">
-  <img src="README_CONTENT/wallpaper01.png" width="500px"/>
+  <img src="README_CONTENT/wallpaper.png" width="500px"/>
 </p>
 
 ## Description
