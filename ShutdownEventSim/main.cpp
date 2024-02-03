@@ -40,6 +40,7 @@ int wmain(const int argc, const wchar_t* const argv[]) {
 
 			::ZeroMemory(&si, sizeof(STARTUPINFO));
 			::ZeroMemory(&pi, sizeof(PROCESS_INFORMATION));
+			si.cb = sizeof(STARTUPINFO);
 		}
 
 		PROCESS_PRINT(L"[+] Press [enter] to send shutdown event to child processes");
