@@ -52,6 +52,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SumMatrix", "SumMatrix\SumM
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "symlinks", "symlinks\symlinks.vcxproj", "{19C47B5A-A0F4-4E16-B7CA-2CB74A1CCD0F}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "FileInfo", "FileInfo\FileInfo.vcxproj", "{A427EAA8-FD42-4D04-A46B-3C23921AB354}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -220,6 +222,14 @@ Global
 		{19C47B5A-A0F4-4E16-B7CA-2CB74A1CCD0F}.Release|x64.Build.0 = Release|x64
 		{19C47B5A-A0F4-4E16-B7CA-2CB74A1CCD0F}.Release|x86.ActiveCfg = Release|Win32
 		{19C47B5A-A0F4-4E16-B7CA-2CB74A1CCD0F}.Release|x86.Build.0 = Release|Win32
+		{A427EAA8-FD42-4D04-A46B-3C23921AB354}.Debug|x64.ActiveCfg = Debug|x64
+		{A427EAA8-FD42-4D04-A46B-3C23921AB354}.Debug|x64.Build.0 = Debug|x64
+		{A427EAA8-FD42-4D04-A46B-3C23921AB354}.Debug|x86.ActiveCfg = Debug|Win32
+		{A427EAA8-FD42-4D04-A46B-3C23921AB354}.Debug|x86.Build.0 = Debug|Win32
+		{A427EAA8-FD42-4D04-A46B-3C23921AB354}.Release|x64.ActiveCfg = Release|x64
+		{A427EAA8-FD42-4D04-A46B-3C23921AB354}.Release|x64.Build.0 = Release|x64
+		{A427EAA8-FD42-4D04-A46B-3C23921AB354}.Release|x86.ActiveCfg = Release|Win32
+		{A427EAA8-FD42-4D04-A46B-3C23921AB354}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
